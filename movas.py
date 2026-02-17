@@ -67,7 +67,7 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown('<div class="product-card">', unsafe_allow_html=True)
     try: st.image("photo_3_2026-02-17_10-12-40.jpg")
-    except: st.write("📦 75ml Image")
+    except: st.write("📦 Big Bottle")
     st.write("#### 75ml (Big)")
     st.write("₦1,300/pack")
     q75 = st.number_input("Qty", min_value=0, key="q75", step=1)
@@ -76,7 +76,7 @@ with col1:
 with col2:
     st.markdown('<div class="product-card">', unsafe_allow_html=True)
     try: st.image("photo_1_2026-02-17_10-12-40.jpg")
-    except: st.write("📦 50ml Image")
+    except: st.write("📦 Medium Bottle")
     st.write("#### 50ml (Medium)")
     st.write("₦1,300/pack")
     q50 = st.number_input("Qty", min_value=0, key="q50", step=1)
@@ -85,7 +85,7 @@ with col2:
 with col3:
     st.markdown('<div class="product-card">', unsafe_allow_html=True)
     try: st.image("photo_2_2026-02-17_10-12-40.jpg")
-    except: st.write("📦 30ml Image")
+    except: st.write("📦 Small Bottle")
     st.write("#### 30ml (Small)")
     st.write("₦1,900/pack")
     q30 = st.number_input("Qty", min_value=0, key="q30", step=1)
@@ -100,9 +100,8 @@ if total > 0:
     
     st.success(f"🏦 Please Transfer ₦{total:,} to: **OPAY (8026294248)**")
     
-    # 📸 MULTIPLE PROOF OF PAYMENT UPLOAD
     st.write("### 📸 Upload Proof of Payment")
-    proofs = st.file_uploader("Attach transfer receipts (You can pick more than one)", type=['jpg', 'png', 'jpeg'], accept_multiple_files=True)
+    proofs = st.file_uploader("Attach transfer receipts", type=['jpg', 'png', 'jpeg'], accept_multiple_files=True)
 
     delivery = st.radio("Delivery Type", ["Pick-Up", "Home Delivery"])
     addr = ""
@@ -122,9 +121,9 @@ if total > 0:
 
 💰 *Total:* ₦{total:,}
 🚚 *Method:* {delivery}
-📍 *Address:* {addr if addr else 'Pick up at 44 Lamina Liasu Road'}
+📍 *Address:* {addr if addr else 'Pick up at Shop'}
 ---
-✅ *I have uploaded {len(proofs)} proof(s) of payment. Sending them now!*"""
+✅ *I am attaching my payment proof now!*"""
 
     wa_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={urllib.parse.quote(order_details)}"
 
@@ -137,9 +136,14 @@ if total > 0:
         if st.button("SEND ORDER TO WHATSAPP ✅"):
             st.balloons()
             st.markdown(f"""
-            <div style="background-color:rgba(255,255,255,0.1); padding:20px; border-radius:15px; text-align:center; border: 2px solid #25D366;">
-                <h3>Thank you, {cust_name}! 🫡</h3>
-                <p>Click the link below. Once WhatsApp opens, <b>hit send</b> and then <b>attach the proof(s)</b> from your gallery.</p>
+            <div style="background-color:rgba(255,255,255,0.15); padding:20px; border-radius:15px; text-align:center; border: 3px solid #25D366;">
+                <h2 style="color:#25D366 !important;">Thank you, {cust_name}! 🫡</h2>
+                <p style="font-size:18px;"><b>HOW TO FINISH YOUR ORDER:</b></p>
+                <div style="text-align:left; color:white; margin-bottom:15px;">
+                    1️⃣ Click the <b>GO TO WHATSAPP</b> button below.<br>
+                    2️⃣ Click <b>SEND</b> in the chat.<br>
+                    3️⃣ Tap the <b>Paperclip icon (📎)</b> or <b>Plus icon (+)</b> and send the screenshot you just uploaded.
+                </div>
             </div>
             """, unsafe_allow_html=True)
             st.link_button("GO TO WHATSAPP NOW 🚀", wa_url)
