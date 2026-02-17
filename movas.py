@@ -30,7 +30,6 @@ st.markdown("""
     }
     h1, h2, h3, h4, p, label, .stMarkdown { color: white !important; }
     
-    /* WhatsApp Button - Large & Green */
     div.stLinkButton > a {
         background-color: #25D366 !important;
         color: white !important;
@@ -92,59 +91,63 @@ with col3:
     q30 = st.number_input("Qty", min_value=0, key="q30", step=1)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- TOTAL & CHECKOUT ---
+# --- TOTAL & PAYMENT ---
 total = (q75 * 1300) + (q50 * 1300) + (q30 * 1900)
 
 if total > 0:
     st.divider()
     st.markdown(f"## Total: ₦{total:,}")
     
-    st.success(f"🏦 Transfer ₦{total:,} to: **OPAY (8026294248)**")
+    st.success(f"🏦 Please Transfer ₦{total:,} to: **OPAY (8026294248)**")
     
+    # 📸 PROOF OF PAYMENT UPLOAD
+    st.write("### 📸 Upload Proof of Payment")
+    proof = st.file_uploader("Attach your transfer receipt/screenshot here", type=['jpg', 'png', 'jpeg'])
+
     delivery = st.radio("Delivery Type", ["Pick-Up", "Home Delivery"])
     addr = ""
     if delivery == "Home Delivery":
-        addr = st.text_area("Enter Detailed Delivery Address", placeholder="Street name, House number, Area...")
+        addr = st.text_area("Enter Detailed Delivery Address")
 
-    # --- THE WHATSAPP MESSAGE ---
-    # This combines Name, Phone, and Address into the message
+    # --- WHATSAPP MESSAGE ---
     order_details = f"""*MOVAS WATER ORDER* 💧
 ---
 👤 *Customer:* {cust_name}
 📞 *Phone:* {cust_phone}
 ---
 📦 *Items:*
-- 75ml (Big): {q75} packs
-- 50ml (Medium): {q50} packs
-- 30ml (Small): {q30} packs
+- 75ml: {q75}
+- 50ml: {q50}
+- 30ml: {q30}
 
-💰 *Total Amount:* ₦{total:,}
-🚚 *Delivery:* {delivery}
-📍 *Address:* {addr if addr else 'Pick up at Shop'}
+💰 *Total:* ₦{total:,}
+🚚 *Method:* {delivery}
+📍 *Address:* {addr if addr else 'Pick up at 44 Lamina Liasu Road'}
 ---
-*Check my next message for the transfer receipt!* ✅"""
+*Proof of Payment is attached in my next message!*"""
 
     wa_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={urllib.parse.quote(order_details)}"
 
-    # --- FINAL STEP ---
-    st.write("### Step 2: Finalize")
+    # --- FINAL ACTION ---
     if not cust_name or not cust_phone:
-        st.warning("⚠️ Please enter your Name and Phone Number to continue.")
+        st.warning("⚠️ Please enter your Name and Phone Number.")
+    elif not proof:
+        st.warning("⚠️ Please upload your proof of payment to proceed.")
     else:
-        if st.button("I HAVE PAID - SHOW THANK YOU PAGE"):
+        # Once they have uploaded proof, they can click this
+        if st.button("SEND ORDER TO WHATSAPP ✅"):
             st.balloons()
             st.markdown(f"""
-            <div style="background-color:rgba(255,255,255,0.1); padding:20px; border-radius:15px; text-align:center;">
-                <h3>Thank You, {cust_name}! 🫡</h3>
-                <p>Your order for ₦{total:,} is ready. Click below to send the details to us on WhatsApp.</p>
+            <div style="background-color:rgba(255,255,255,0.1); padding:20px; border-radius:15px; text-align:center; border: 2px solid #25D366;">
+                <h3>Thank you, {cust_name}! 🫡</h3>
+                <p>Click the link below to open WhatsApp and send your order details.</p>
             </div>
             """, unsafe_allow_html=True)
-            st.link_button("SEND ORDER TO WHATSAPP ✅", wa_url)
+            st.link_button("GO TO WHATSAPP NOW 🚀", wa_url)
 
 st.divider()
-# Footer
 f1, f2 = st.columns(2)
 with f1:
-    st.link_button("📞 CALL FOR ENQUIRY", f"tel:{CALL_NUMBER}")
+    st.link_button("📞 CALL 08022233604", f"tel:{CALL_NUMBER}")
 with f2:
-    st.link_button("💬 CHAT WITH SUPPORT", f"https://wa.me/{WHATSAPP_NUMBER}")
+    st.link_button("💬 CHAT SUPPORT", f"https://wa.me/{WHATSAPP_NUMBER}")
