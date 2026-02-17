@@ -1,12 +1,13 @@
 import streamlit as st
 import urllib.parse
 
-# --- CONFIGURATION ---
+# --- CONFIG ---
 WHATSAPP_NUMBER = "2348026294248" 
+CALL_NUMBER = "08022233604"
 
-st.set_page_config(page_title="Movas Water Shop", page_icon="💧", layout="wide")
+st.set_page_config(page_title="Movas Water", page_icon="💧", layout="wide")
 
-# --- DARK MODE ANIMATED BACKGROUND ---
+# --- DARK DESIGN ---
 st.markdown("""
     <style>
     .stApp {
@@ -19,49 +20,51 @@ st.markdown("""
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
     }
-    
-    /* DARK CARDS */
     .product-card {
-        background: rgba(0, 0, 0, 0.6); /* Black transparent background */
-        backdrop-filter: blur(15px);
+        background: rgba(0, 0, 0, 0.8); /* Solid Black Transparency */
         padding: 25px;
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        border: 1px solid #0074D9;
         text-align: center;
-        color: white;
         margin-bottom: 20px;
     }
+    h1, h2, h3, h4, p, label { color: white !important; }
     
-    /* Make text readable */
-    h1, h2, h3, h4, p, label, .stMarkdown {
-        color: #e0e0e0 !important;
-        font-family: 'Inter', sans-serif;
-    }
-
-    /* Input Box Styling */
-    input {
-        background-color: #1a1a1a !important;
+    /* WhatsApp Button Green */
+    .wa-button a {
+        background-color: #25D366 !important;
         color: white !important;
-        border: 1px solid #333 !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+        font-size: 18px !important;
+        text-align: center !important;
+        display: block !important;
+        padding: 10px;
+        text-decoration: none;
+    }
+    /* Call Button Blue */
+    .call-button a {
+        background-color: #0074D9 !important;
+        color: white !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+        font-size: 18px !important;
+        text-align: center !important;
+        display: block !important;
+        padding: 10px;
+        text-decoration: none;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- APP START ---
 st.title("💧 Movas Table Water")
-st.write("### Quality Hydration | Direct WhatsApp Ordering")
+st.write("Freshness you can trust. Order below.")
 
-# We removed the "Verification Code" section to prevent errors. 
-# The shop is now open immediately.
-
+# --- PRODUCT DISPLAY ---
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.markdown('<div class="product-card">', unsafe_allow_html=True)
-    try:
-        st.image("photo_3_2026-02-17_10-12-40.jpg")
-    except:
-        st.write("📦 Image Missing")
     st.write("#### 75ml (Big)")
     st.write("₦1,300 per pack")
     q75 = st.number_input("Packs", min_value=0, key="q75", step=1)
@@ -69,10 +72,6 @@ with col1:
 
 with col2:
     st.markdown('<div class="product-card">', unsafe_allow_html=True)
-    try:
-        st.image("photo_1_2026-02-17_10-12-40.jpg")
-    except:
-        st.write("📦 Image Missing")
     st.write("#### 50ml (Medium)")
     st.write("₦1,300 per pack")
     q50 = st.number_input("Packs", min_value=0, key="q50", step=1)
@@ -80,10 +79,6 @@ with col2:
 
 with col3:
     st.markdown('<div class="product-card">', unsafe_allow_html=True)
-    try:
-        st.image("photo_2_2026-02-17_10-12-40.jpg")
-    except:
-        st.write("📦 Image Missing")
     st.write("#### 30ml (Small)")
     st.write("₦1,900 per pack")
     q30 = st.number_input("Packs", min_value=0, key="q30", step=1)
@@ -93,30 +88,39 @@ total = (q75 * 1300) + (q50 * 1300) + (q30 * 1900)
 
 if total > 0:
     st.divider()
-    st.write(f"## Total: ₦{total:,}")
+    st.markdown(f"## Total Amount: ₦{total:,}")
     
     # Dark Payment Box
     st.markdown(f"""
-    <div style="background-color:rgba(0,0,0,0.8); padding:20px; border-radius:15px; border: 1px solid #0074D9;">
-        <h3 style="color:#7FDBFF !important;">💳 Payment Information</h3>
-        <p>Transfer ₦{total:,} to:</p>
-        <p><b>OPAY: 8026294248</b></p>
-        <p>Name: Movas Water</p>
+    <div style="background-color:rgba(0, 0, 0, 0.6); padding:20px; border-radius:10px; border-left: 5px solid #0074D9;">
+        <h4 style="margin-top:0;">💳 Payment Details</h4>
+        <p>Transfer to: <b>OPAY - 8026294248</b></p>
+        <p>Account Name: Movas Water</p>
     </div>
     """, unsafe_allow_html=True)
     
-    method = st.radio("Delivery Option", ["Self Pick-Up", "Home Delivery"])
-    addr = ""
-    if method == "Home Delivery":
-        addr = st.text_input("Delivery Address")
+    method = st.radio("How do you want it?", ["Pick-Up", "Delivery"])
+    addr = st.text_input("Enter Address (if delivery)") if method == "Delivery" else ""
 
-    # Generate Message
-    msg = f"Hello Movas! 💧\nI want to order:\n- 75ml: {q75} packs\n- 50ml: {q50} packs\n- 30ml: {q30} packs\n\nTotal: ₦{total:,}\nMethod: {method}\nAddress: {addr}\n\nI am sending my proof of payment now."
+    # WhatsApp Link
+    msg = f"Order Request 💧\n---\nItems:\n- 75ml: {q75}\n- 50ml: {q50}\n- 30ml: {q30}\n\nTotal: ₦{total:,}\nMethod: {method}\nAddress: {addr}"
     wa_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={urllib.parse.quote(msg)}"
 
-    if st.button("SEND ORDER VIA WHATSAPP ✅"):
-        st.write(f'<meta http-equiv="refresh" content="0;url={wa_url}">', unsafe_allow_html=True)
-        st.link_button("Click here if not redirected", wa_url)
+    # Buttons
+    st.write("### Step 2: Complete Order")
+    st.markdown(f'<div class="wa-button"><a href="{wa_url}" target="_blank">SEND ORDER TO WHATSAPP ✅</a></div>', unsafe_allow_html=True)
 
 st.divider()
-st.write("📍 44 Lamina Liasu Road, Ikotun Egbe")
+
+# --- FOOTER SUPPORT ---
+st.write("### Need Assistance?")
+fcol1, fcol2 = st.columns(2)
+
+with fcol1:
+    st.markdown(f'<div class="call-button"><a href="tel:{CALL_NUMBER}">📞 CALL US NOW</a></div>', unsafe_allow_html=True)
+
+with fcol2:
+    support_wa = f"https://wa.me/{WHATSAPP_NUMBER}?text=I%20need%20help%20with%20an%20order"
+    st.markdown(f'<div class="wa-button"><a href="{support_wa}" target="_blank">💬 CHAT SUPPORT</a></div>', unsafe_allow_html=True)
+
+st.caption("📍 Shop: 44 Lamina Liasu Road, Ikotun Egbe")
