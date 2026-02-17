@@ -100,9 +100,9 @@ if total > 0:
     
     st.success(f"🏦 Please Transfer ₦{total:,} to: **OPAY (8026294248)**")
     
-    # 📸 PROOF OF PAYMENT UPLOAD
+    # 📸 MULTIPLE PROOF OF PAYMENT UPLOAD
     st.write("### 📸 Upload Proof of Payment")
-    proof = st.file_uploader("Attach your transfer receipt/screenshot here", type=['jpg', 'png', 'jpeg'])
+    proofs = st.file_uploader("Attach transfer receipts (You can pick more than one)", type=['jpg', 'png', 'jpeg'], accept_multiple_files=True)
 
     delivery = st.radio("Delivery Type", ["Pick-Up", "Home Delivery"])
     addr = ""
@@ -124,23 +124,22 @@ if total > 0:
 🚚 *Method:* {delivery}
 📍 *Address:* {addr if addr else 'Pick up at 44 Lamina Liasu Road'}
 ---
-*Proof of Payment is attached in my next message!*"""
+✅ *I have uploaded {len(proofs)} proof(s) of payment. Sending them now!*"""
 
     wa_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={urllib.parse.quote(order_details)}"
 
     # --- FINAL ACTION ---
     if not cust_name or not cust_phone:
         st.warning("⚠️ Please enter your Name and Phone Number.")
-    elif not proof:
-        st.warning("⚠️ Please upload your proof of payment to proceed.")
+    elif not proofs:
+        st.warning("⚠️ Please upload your proof(s) of payment to proceed.")
     else:
-        # Once they have uploaded proof, they can click this
         if st.button("SEND ORDER TO WHATSAPP ✅"):
             st.balloons()
             st.markdown(f"""
             <div style="background-color:rgba(255,255,255,0.1); padding:20px; border-radius:15px; text-align:center; border: 2px solid #25D366;">
                 <h3>Thank you, {cust_name}! 🫡</h3>
-                <p>Click the link below to open WhatsApp and send your order details.</p>
+                <p>Click the link below. Once WhatsApp opens, <b>hit send</b> and then <b>attach the proof(s)</b> from your gallery.</p>
             </div>
             """, unsafe_allow_html=True)
             st.link_button("GO TO WHATSAPP NOW 🚀", wa_url)
