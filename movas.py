@@ -3,28 +3,47 @@ import random
 import smtplib
 from email.message import EmailMessage
 
-# --- CONFIGURATION ---
-SENDER_EMAIL = "your-gmail@gmail.com"
-SENDER_PASS = "your-app-password" # Not your login password, a Google App Password
+# --- CONFIGURATION (UPDATE THESE!) ---
+SENDER_EMAIL = "adamsoluwatosin65@gmail.com" 
+SENDER_PASS = "xxxx xxxx xxxx xxxx" # USE YOUR 16-DIGIT APP PASSWORD HERE
 
-st.set_page_config(page_title="Movas Water Shop", page_icon="💧")
+st.set_page_config(page_title="Movas Water", page_icon="💧", layout="centered")
+
+# --- CUSTOM CSS (BACKGROUND & STYLING) ---
+st.markdown(f"""
+    <style>
+    .stApp {{
+        background: linear-gradient(180deg, #ffffff 0%, #e3f2fd 100%);
+    }}
+    .product-card {{
+        background-color: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 20px;
+    }}
+    h1, h2, h3 {{
+        color: #01579b;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
 
 # --- SESSION STATE ---
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
-if 'verification_code' not in st.session_state:
-    st.session_state.verification_code = None
+if 'otp' not in st.session_state:
+    st.session_state.otp = None
 
 # --- EMAIL LOGIC ---
 def send_otp(receiver_email):
     otp = str(random.randint(100000, 999999))
-    st.session_state.verification_code = otp
+    st.session_state.otp = otp
     msg = EmailMessage()
     msg.set_content(f"Your Movas Water verification code is: {otp}")
-    msg['Subject'] = "Verification Code - Movas Water"
+    msg['Subject'] = "💧 Movas Verification Code"
     msg['From'] = SENDER_EMAIL
     msg['To'] = receiver_email
-
     try:
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.login(SENDER_EMAIL, SENDER_PASS)
@@ -32,75 +51,79 @@ def send_otp(receiver_email):
         server.quit()
         return True
     except Exception as e:
-        st.error(f"Error sending email: {e}")
+        st.error(f"Error: {e}")
         return False
 
-# --- UI: REGISTRATION ---
+# --- AUTHENTICATION PAGE ---
 if not st.session_state.authenticated:
-    st.title("💧 Movas Table Water")
-    st.subheader("Please Register to Start Shopping")
+    st.image("https://raw.githubusercontent.com/re-movas-logo-here.png", width=150) # Use your logo here
+    st.title("Welcome to Movas Water 💧")
+    st.write("Please verify your Gmail to access the shop.")
     
-    email = st.text_input("Enter your Gmail address")
-    if st.button("Send Verification Code"):
-        if email:
-            if send_otp(email):
-                st.success("Code sent! Check your inbox.")
-        else:
-            st.warning("Please enter an email.")
-
-    code_input = st.text_input("Enter the 6-digit code")
-    if st.button("Verify & Enter"):
-        if code_input == st.session_state.verification_code:
+    email_user = st.text_input("Enter Gmail Address")
+    if st.button("Get Verification Code"):
+        if send_otp(email_user):
+            st.success("Code sent! Check your inbox.")
+            
+    code = st.text_input("Enter 6-Digit Code")
+    if st.button("Verify & Enter Shop"):
+        if code == st.session_state.otp:
             st.session_state.authenticated = True
             st.rerun()
         else:
-            st.error("Invalid code.")
+            st.error("Wrong code, try again.")
 
-# --- UI: THE SHOP ---
+# --- MAIN SHOP PAGE ---
 else:
-    st.title("🛒 Movas Online Store")
+    st.title("💧 Movas Table Water Shop")
+    st.write("### Freshness Delivered to Your Doorstep")
+
+    # Product Columns
+    col1, col2, col3 = st.columns(3)
     
-    # Product Data
-    products = {
-        "Bigger Bottle (75ml) - 15 per pack": 1300,
-        "Medium Bottle (50ml) - 15 per pack": 1300,
-        "Smallest Bottle (30ml) - 20 per pack": 1900
-    }
+    with col1:
+        st.markdown('<div class="product-card">', unsafe_allow_html=True)
+        st.image("photo_3_2026-02-17_10-12-40.jpg", caption="75ml (Big)")
+        st.write("**Bigger Bottle (75ml)**")
+        st.write("15 per pack - ₦1,300")
+        qty_75 = st.number_input("Packs (75ml)", min_value=0, step=1, key="q75")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    st.write("### Choose Your Packs")
-    order_summary = {}
-    total_price = 0
+    with col2:
+        st.markdown('<div class="product-card">', unsafe_allow_html=True)
+        st.image("photo_1_2026-02-17_10-12-40.jpg", caption="50ml (Medium)")
+        st.write("**Medium Bottle (50ml)**")
+        st.write("15 per pack - ₦1,300")
+        qty_50 = st.number_input("Packs (50ml)", min_value=0, step=1, key="q50")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    for item, price in products.items():
-        qty = st.number_input(f"{item} (₦{price:,} per pack)", min_value=0, step=1)
-        if qty > 0:
-            order_summary[item] = qty
-            total_price += qty * price
+    with col3:
+        st.markdown('<div class="product-card">', unsafe_allow_html=True)
+        st.image("photo_2_2026-02-17_10-12-40.jpg", caption="30ml (Small)")
+        st.write("**Smallest Bottle (30ml)**")
+        st.write("20 per pack - ₦1,900")
+        qty_30 = st.number_input("Packs (30ml)", min_value=0, step=1, key="q30")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    if total_price > 0:
+    total = (qty_75 * 1300) + (qty_50 * 1300) + (qty_30 * 1900)
+
+    if total > 0:
         st.divider()
-        st.write(f"### Total: ₦{total_price:,}")
+        st.subheader(f"Total Amount: ₦{total:,}")
         
-        if st.button("Proceed to Checkout"):
-            st.session_state.checkout = True
-
-    # --- CHECKOUT SECTION ---
-    if st.session_state.get('checkout'):
-        st.header("💳 Payment & Delivery")
-        st.info("Transfer to: **8026294248 | OPAY**")
-        
-        proof = st.file_uploader("Upload Proof of Payment (Screenshot)", type=['png', 'jpg', 'jpeg'])
-        
-        delivery_type = st.radio("Delivery Method", ["Pick Up", "Home Delivery"])
-        
-        if delivery_type == "Pick Up":
-            st.write("📍 **Pick up at:** 44 Lamina Liasu Road, Ikotun Egbe")
-        else:
-            address = st.text_area("Enter Delivery Address")
-
-        if st.button("Confirm Order"):
-            if proof:
-                st.success("Order Received! A confirmation email is being sent. 🚀")
-                # Add logic here to send the final order email to you and the customer
+        if st.checkbox("Proceed to Checkout 💳"):
+            st.info("Transfer to: **8026294248 | OPAY**")
+            proof = st.file_uploader("Upload Proof of Payment", type=['jpg', 'png'])
+            
+            method = st.radio("Delivery Option", ["Pick Up", "Delivery"])
+            if method == "Pick Up":
+                st.write("📍 **44 Lamina Liasu Road, Ikotun Egbe**")
             else:
-                st.error("Please upload your proof of payment first.")
+                address = st.text_area("Delivery Address")
+            
+            if st.button("Complete Order 🚀"):
+                if proof:
+                    st.success("Order Placed! Check your Gmail for confirmation.")
+                    # Add logic here to send final email to you/customer
+                else:
+                    st.warning("Please upload payment proof.")
