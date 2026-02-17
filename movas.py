@@ -1,22 +1,18 @@
 import streamlit as st
-import random
-import smtplib
-from email.message import EmailMessage
+import urllib.parse
 
-# --- 1. SETTINGS & AUTH (FIX THIS LINE!) ---
-SENDER_EMAIL = "adamsoluwatosin65@gmail.com" 
-SENDER_PASS = "xxxx xxxx xxxx xxxx" # Replace with your 16-digit App Password
+# --- CONFIGURATION ---
+WHATSAPP_NUMBER = "2348026294248" 
 
 st.set_page_config(page_title="Movas Water Shop", page_icon="💧", layout="wide")
 
-# --- 2. THE ANIMATED NAVY/SKY BLUE BACKGROUND ---
+# --- ANIMATED NAVY/SKY BLUE BACKGROUND ---
 st.markdown("""
     <style>
     .stApp {
         background: linear-gradient(-45deg, #001f3f, #0074D9, #7FDBFF, #001f3f);
         background-size: 400% 400%;
-        animation: gradientBG 10s ease infinite;
-        color: white;
+        animation: gradientBG 8s ease infinite;
     }
     @keyframes gradientBG {
         0% { background-position: 0% 50%; }
@@ -25,97 +21,95 @@ st.markdown("""
     }
     .product-card {
         background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        padding: 20px;
-        border-radius: 15px;
+        backdrop-filter: blur(12px);
+        padding: 25px;
+        border-radius: 20px;
         border: 1px solid rgba(255, 255, 255, 0.2);
         text-align: center;
-        margin-bottom: 15px;
+        color: white;
+        transition: 0.3s;
     }
-    h1, h2, h3, p, span, label {
-        color: white !important;
+    .product-card:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-5px);
     }
-    /* Fixing input visibility */
-    input {
-        color: black !important;
+    h1, h2, h3, p, label { color: white !important; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .stButton>button {
+        width: 100%;
+        border-radius: 10px;
+        height: 3em;
+        font-weight: bold;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 3. THE EMAIL ENGINE ---
-def send_movas_email(subject, receiver, body):
-    msg = EmailMessage()
-    msg.set_content(body)
-    msg['Subject'] = subject
-    msg['From'] = SENDER_EMAIL
-    msg['To'] = receiver
-    try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(SENDER_EMAIL, SENDER_PASS)
-            server.send_message(msg)
-        return True
-    except Exception as e:
-        st.error(f"Login failed. Check your App Password! Error: {e}")
-        return False
+# --- HEADER ---
+st.image("photo_2026-02-17_10-14-26.jpg", width=150)
+st.title("💧 Movas Table Water")
+st.write("### Quality Hydration, Delivered Fast.")
+st.divider()
 
-# --- 4. APP LOGIC ---
-if 'authenticated' not in st.session_state:
-    st.session_state.authenticated = False
+# --- PRODUCT SECTION ---
+col1, col2, col3 = st.columns(3)
 
-# PAGE A: LOGIN
-if not st.session_state.authenticated:
-    st.title("💧 Movas Table Water")
-    st.subheader("Register to Unlock Freshness")
+with col1:
+    st.markdown('<div class="product-card">', unsafe_allow_html=True)
+    st.image("photo_3_2026-02-17_10-12-40.jpg", caption="75ml Big Bottle")
+    st.write("#### ₦1,300 / Pack")
+    q75 = st.number_input("How many packs?", min_value=0, key="q75", step=1)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with col2:
+    st.markdown('<div class="product-card">', unsafe_allow_html=True)
+    st.image("photo_1_2026-02-17_10-12-40.jpg", caption="50ml Medium Bottle")
+    st.write("#### ₦1,300 / Pack")
+    q50 = st.number_input("How many packs?", min_value=0, key="q50", step=1)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with col3:
+    st.markdown('<div class="product-card">', unsafe_allow_html=True)
+    st.image("photo_2_2026-02-17_10-12-40.jpg", caption="30ml Small Bottle")
+    st.write("#### ₦1,900 / Pack")
+    q30 = st.number_input("How many packs?", min_value=0, key="q30", step=1)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# --- CHECKOUT CALCULATIONS ---
+total = (q75 * 1300) + (q50 * 1300) + (q30 * 1900)
+
+if total > 0:
+    st.markdown(f"## 🛒 Order Total: ₦{total:,}")
     
-    user_mail = st.text_input("Enter your Gmail")
-    if st.button("Send Code"):
-        otp = str(random.randint(100000, 999999))
-        st.session_state.otp = otp
-        if send_movas_email("💧 Movas Verification Code", user_mail, f"Your code: {otp}"):
-            st.success("Verification code sent!")
-
-    code_in = st.text_input("Enter 6-Digit Code")
-    if st.button("Access Shop"):
-        if code_in == st.session_state.get('otp'):
-            st.session_state.authenticated = True
-            st.rerun()
-        else:
-            st.error("Invalid Code")
-
-# PAGE B: THE SHOP
-else:
-    st.title("🛒 Movas Order Center")
+    with st.container():
+        st.markdown("""
+        <div style="background-color:rgba(255,255,255,0.9); padding:20px; border-radius:15px; color:#001f3f;">
+            <h3 style="color:#001f3f !important; margin-top:0;">💳 Payment Details</h3>
+            <p style="color:#001f3f !important; font-size:18px;">Bank: <b>OPAY</b></p>
+            <p style="color:#001f3f !important; font-size:18px;">Account Number: <b>8026294248</b></p>
+            <p style="color:#001f3f !important; font-size:18px;">Account Name: <b>Movas Water</b></p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    st.write("")
+    delivery = st.radio("Delivery Method", ["Self Pick-Up", "Home Delivery"])
     
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown('<div class="product-card">', unsafe_allow_html=True)
-        st.write("### 75ml (Big)")
-        st.write("₦1,300 per pack")
-        q75 = st.number_input("Packs", min_value=0, key="q75")
-        st.markdown('</div>', unsafe_allow_html=True)
+    address = ""
+    if delivery == "Home Delivery":
+        address = st.text_input("Enter Delivery Address", placeholder="e.g. 123 Street Name, Ikotun")
 
-    with col2:
-        st.markdown('<div class="product-card">', unsafe_allow_html=True)
-        st.write("### 50ml (Medium)")
-        st.write("₦1,300 per pack")
-        q50 = st.number_input("Packs", min_value=0, key="q50")
-        st.markdown('</div>', unsafe_allow_html=True)
+    # Order Message Logic
+    order_msg = f"*New Order from Website* 💧\n---\n📦 *Items:*\n- 75ml: {q75} packs\n- 50ml: {q50} packs\n- 30ml: {q30} packs\n\n💰 *Total:* ₦{total:,}\n🚚 *Method:* {delivery}\n📍 *Address:* {address if address else 'Pick up at Shop'}"
+    wa_order_link = f"https://wa.me/{WHATSAPP_NUMBER}?text={urllib.parse.quote(order_msg)}"
 
-    with col3:
-        st.markdown('<div class="product-card">', unsafe_allow_html=True)
-        st.write("### 30ml (Small)")
-        st.write("₦1,900 per pack")
-        q30 = st.number_input("Packs", min_value=0, key="q30")
-        st.markdown('</div>', unsafe_allow_html=True)
+    if st.button("Complete Order & Send Receipt ✅"):
+        st.write(f'<meta http-equiv="refresh" content="0;url={wa_order_link}">', unsafe_allow_html=True)
 
-    total = (q75 * 1300) + (q50 * 1300) + (q30 * 1900)
-    
-    if total > 0:
-        st.markdown(f"## Total: ₦{total:,}")
-        if st.checkbox("Proceed to Payment"):
-            st.info("Transfer to: **8026294248 | OPAY (Movas)**")
-            st.file_uploader("Upload Receipt")
-            if st.button("Confirm Order"):
-                st.balloons()
-                st.success("Order Placed!")
+# --- FOOTER / SUPPORT ---
+st.divider()
+support_msg = "Hello Movas Support, I have a question about my water order."
+wa_support_link = f"https://wa.me/{WHATSAPP_NUMBER}?text={urllib.parse.quote(support_msg)}"
+
+st.write("### Need Help?")
+if st.button("Chat with Support on WhatsApp 💬"):
+    st.write(f'<meta http-equiv="refresh" content="0;url={wa_support_link}">', unsafe_allow_html=True)
+
+st.caption("📍 Visit us: 44 Lamina Liasu Road, Ikotun Egbe")
