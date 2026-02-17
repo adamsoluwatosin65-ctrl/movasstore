@@ -21,106 +21,76 @@ st.markdown("""
         100% { background-position: 0% 50%; }
     }
     .product-card {
-        background: rgba(0, 0, 0, 0.8); /* Solid Black Transparency */
-        padding: 25px;
+        background: rgba(0, 0, 0, 0.85);
+        padding: 20px;
         border-radius: 15px;
         border: 1px solid #0074D9;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
     h1, h2, h3, h4, p, label { color: white !important; }
     
-    /* WhatsApp Button Green */
-    .wa-button a {
+    /* WhatsApp Button - Large & Green */
+    div.stLinkButton > a {
         background-color: #25D366 !important;
         color: white !important;
-        border-radius: 10px !important;
+        border-radius: 15px !important;
+        padding: 20px !important;
+        font-size: 22px !important;
         font-weight: bold !important;
-        font-size: 18px !important;
-        text-align: center !important;
+        border: none !important;
         display: block !important;
-        padding: 10px;
-        text-decoration: none;
-    }
-    /* Call Button Blue */
-    .call-button a {
-        background-color: #0074D9 !important;
-        color: white !important;
-        border-radius: 10px !important;
-        font-weight: bold !important;
-        font-size: 18px !important;
         text-align: center !important;
-        display: block !important;
-        padding: 10px;
-        text-decoration: none;
     }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("💧 Movas Table Water")
-st.write("Freshness you can trust. Order below.")
 
-# --- PRODUCT DISPLAY ---
+# --- PRODUCTS ---
 col1, col2, col3 = st.columns(3)
-
 with col1:
-    st.markdown('<div class="product-card">', unsafe_allow_html=True)
-    st.write("#### 75ml (Big)")
-    st.write("₦1,300 per pack")
-    q75 = st.number_input("Packs", min_value=0, key="q75", step=1)
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    st.markdown('<div class="product-card"><h4>75ml (Big)</h4><p>₦1,300/pack</p></div>', unsafe_allow_html=True)
+    q75 = st.number_input("Packs", min_value=0, key="q75")
 with col2:
-    st.markdown('<div class="product-card">', unsafe_allow_html=True)
-    st.write("#### 50ml (Medium)")
-    st.write("₦1,300 per pack")
-    q50 = st.number_input("Packs", min_value=0, key="q50", step=1)
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    st.markdown('<div class="product-card"><h4>50ml (Medium)</h4><p>₦1,300/pack</p></div>', unsafe_allow_html=True)
+    q50 = st.number_input("Packs", min_value=0, key="q50")
 with col3:
-    st.markdown('<div class="product-card">', unsafe_allow_html=True)
-    st.write("#### 30ml (Small)")
-    st.write("₦1,900 per pack")
-    q30 = st.number_input("Packs", min_value=0, key="q30", step=1)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="product-card"><h4>30ml (Small)</h4><p>₦1,900/pack</p></div>', unsafe_allow_html=True)
+    q30 = st.number_input("Packs", min_value=0, key="q30")
 
 total = (q75 * 1300) + (q50 * 1300) + (q30 * 1900)
 
 if total > 0:
     st.divider()
-    st.markdown(f"## Total Amount: ₦{total:,}")
+    st.markdown(f"## Total: ₦{total:,}")
     
-    # Dark Payment Box
-    st.markdown(f"""
-    <div style="background-color:rgba(0, 0, 0, 0.6); padding:20px; border-radius:10px; border-left: 5px solid #0074D9;">
-        <h4 style="margin-top:0;">💳 Payment Details</h4>
-        <p>Transfer to: <b>OPAY - 8026294248</b></p>
-        <p>Account Name: Movas Water</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Payment Box
+    st.success(f"🏦 Transfer ₦{total:,} to: **OPAY (8026294248)**")
     
-    method = st.radio("How do you want it?", ["Pick-Up", "Delivery"])
-    addr = st.text_input("Enter Address (if delivery)") if method == "Delivery" else ""
+    delivery = st.radio("Delivery Type", ["Pick-Up", "Home Delivery"])
+    addr = st.text_input("Enter Address") if delivery == "Home Delivery" else ""
 
-    # WhatsApp Link
-    msg = f"Order Request 💧\n---\nItems:\n- 75ml: {q75}\n- 50ml: {q50}\n- 30ml: {q30}\n\nTotal: ₦{total:,}\nMethod: {method}\nAddress: {addr}"
+    # Message Setup
+    msg = f"New Water Order 💧\n---\nItems:\n- 75ml: {q75}\n- 50ml: {q50}\n- 30ml: {q30}\n\nTotal: ₦{total:,}\nMethod: {delivery}\nAddress: {addr}"
     wa_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={urllib.parse.quote(msg)}"
 
-    # Buttons
-    st.write("### Step 2: Complete Order")
-    st.markdown(f'<div class="wa-button"><a href="{wa_url}" target="_blank">SEND ORDER TO WHATSAPP ✅</a></div>', unsafe_allow_html=True)
+    # --- THE FINAL BUTTON ---
+    st.write("### Step 2: Confirm & Send")
+    if st.button("I HAVE PAID - SHOW ORDER BUTTON"):
+        st.balloons()
+        st.markdown(f"""
+        <div style="background-color:rgba(255,255,255,0.1); padding:20px; border-radius:15px; text-align:center;">
+            <h3>Thank You for choosing Movas! 🫡</h3>
+            <p>Click the green button below to finalize your order on WhatsApp.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.link_button("CLICK HERE TO SEND TO WHATSAPP ✅", wa_url)
 
 st.divider()
-
-# --- FOOTER SUPPORT ---
-st.write("### Need Assistance?")
-fcol1, fcol2 = st.columns(2)
-
-with fcol1:
-    st.markdown(f'<div class="call-button"><a href="tel:{CALL_NUMBER}">📞 CALL US NOW</a></div>', unsafe_allow_html=True)
-
-with fcol2:
-    support_wa = f"https://wa.me/{WHATSAPP_NUMBER}?text=I%20need%20help%20with%20an%20order"
-    st.markdown(f'<div class="wa-button"><a href="{support_wa}" target="_blank">💬 CHAT SUPPORT</a></div>', unsafe_allow_html=True)
-
-st.caption("📍 Shop: 44 Lamina Liasu Road, Ikotun Egbe")
+# Footer Buttons
+f1, f2 = st.columns(2)
+with f1:
+    st.link_button("📞 CALL FOR ENQUIRY", f"tel:{CALL_NUMBER}")
+with f2:
+    st.link_button("💬 CHAT WITH SUPPORT", f"https://wa.me/{WHATSAPP_NUMBER}")
